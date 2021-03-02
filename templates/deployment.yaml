@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "hydatis-{{.Release.Name }}"
+  labels:
+    app: "hydatis-{{.Release.Name }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: "hydatis-{{.Release.Name }}"
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        app: "hydatis-{{.Release.Name }}"
+    spec:
+      containers:
+        - name: "hydatis-{{.Release.Name }}"
+          image: "{{ .Values.image.repository }}/hydatis-{{.Release.Name }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{.Values.containerPort}}
+              protocol: TCP
+      imagePullSecrets:
+        - name: {{.Values.secret}}
